@@ -10,15 +10,15 @@ parser.add_argument("--test_sample_size", type=int, default=30, help="Number of 
 parser.add_argument("--prompt_testing", type=bool, default=False, help="Test the prompt generation")
 args = parser.parse_args()
 
-dataset = pd.read_csv("Datasets/D3 - Anotación Original.tsv", sep="\t")
+dataset = pd.read_csv("datasets/D3 - Anotación Original.tsv", sep="\t")
 client = OpenAI()
 sample_all = dataset.sample(args.test_sample_size + args.fewshot_samples, random_state=43)
 FEWSHOT_SAMPLES = sample_all.iloc[:args.fewshot_samples, :]
 sample = sample_all.iloc[args.fewshot_samples:, :]
 
 if not args.prompt_testing:
-    d1 = pd.read_csv("Datasets/D1 - Anotación Original.tsv", sep="\t")
-    d2 = pd.read_csv("Datasets/D2 - Anotación Original.tsv", sep="\t")
+    d1 = pd.read_csv("datasets/D1 - Anotación Original.tsv", sep="\t")
+    d2 = pd.read_csv("datasets/D2 - Anotación Original.tsv", sep="\t")
     to_label_d1 = {"dataset": d1[d1["nro"] > 120], "name": "D1"}
     to_label_d2 = {"dataset": d2[d2["nro"] > 120], "name": "D2"}
 
@@ -106,7 +106,7 @@ if args.prompt_testing:
 else:
     for dataset in [to_label_d1, to_label_d2]:
         name = dataset["name"]
-        w = open("Datasets/" + name + " - Anotación ChatGPT.tsv", "w")
+        w = open("datasets/" + name + " - Anotación ChatGPT.tsv", "w")
         for example in dataset["dataset"].to_dict(orient="records"):
             prompt = get_prompt(example, few_shot=FEWSHOT_SAMPLES.to_dict(orient="records"))
             completion = client.chat.completions.create(
